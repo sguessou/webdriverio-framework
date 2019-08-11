@@ -12,6 +12,7 @@ describe('Shop CTA Button', () => {
         
         const link = browser.$('.shop-callout a');
         link.click();
+        // browser.debug();
 
         const title = browser.getTitle();
         expect(title).to.be.equal('Totally Not Evil Sentient Robot - Robot Parts Emporium');
