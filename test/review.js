@@ -52,7 +52,7 @@ describe('The product review form', () => {
         // Enter text in the comment form
         browser.$("#review-content").setValue("Robots rules!!!");
 
-        // move focus & submit the review
+        // move focus and submit the review
         browser.$("#comment-form > button").click();
         browser.$("#comment-form > button").click();
         
@@ -61,5 +61,24 @@ describe('The product review form', () => {
        
         expect(isMainErrorShowing, "Main error not showing").to.be.false;
         expect(isContentErrorShowing, "Content error not showing").to.be.false;
+    });
+
+    it.only('should focus on the first invalid input field on error', () => {
+        let emailHasFocus = browser.$("#review-email").isFocused();
+        expect(emailHasFocus, "email should not have focus").to.be.false;
+
+        browser.$("#comment-form > button").click();
+        
+        emailHasFocus = browser.$("#review-email").isFocused();
+        expect(emailHasFocus, "email should now have focus").to.be.true;
+
+        browser.$("#review-email").setValue("email@example.com");
+
+        // move focus and submit form
+        browser.$("#comment-form > button").click();
+        browser.$("#comment-form > button").click();
+        
+        const contentHasFocus = browser.$("#review-content").isFocused();
+        expect(contentHasFocus, "review content field should have focus").to.be.true;
     });
 });
