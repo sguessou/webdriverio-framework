@@ -63,7 +63,7 @@ describe('The product review form', () => {
         expect(isContentErrorShowing, "Content error not showing").to.be.false;
     });
 
-    it.only('should focus on the first invalid input field on error', () => {
+    it('should focus on the first invalid input field on error', () => {
         let emailHasFocus = browser.$("#review-email").isFocused();
         expect(emailHasFocus, "email should not have focus").to.be.false;
 
