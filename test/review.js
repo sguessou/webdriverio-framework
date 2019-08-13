@@ -1,3 +1,5 @@
+const request = require('sync-request');
+
 browser.addCommand("submitReview", (email, review) => {
     if (email) {
         // Enter the email address
@@ -79,5 +81,22 @@ describe('The product review form', () => {
         
         const contentHasFocus = browser.$("#review-content").isFocused();
         expect(contentHasFocus, "review content field should have focus").to.be.true;
+    });
+
+    it('should allow multiple reviews', () => {
+        const res = request('GET', 'http://jsonplaceholder.typicode.com/posts/1/comments');
+
+        let comments = JSON.parse(res.getBody().toString('utf8'));
+        comments = comments.slice(0, 20);
+
+        comments.forEach((comment, idx) => {
+            browser.submitReview(comment.email, comment.name);
+
+            const email = browser.$(`.reviews > .comment:nth-of-type(${idx + 3}) .email`).getText();
+            expect(email).to.equal(comment.email);
+
+            const reviewText = browser.$(`.reviews > .comment:nth-of-type(${idx + 3}) .comment`).getText();
+            expect(reviewText).to.equal(comment.name);
+        });
     });
 });

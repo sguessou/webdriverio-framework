@@ -1,3 +1,4 @@
+const notifier = require('node-notifier');
 
 let baseUrl =  'http://127.0.0.1:8303';
 
@@ -151,8 +152,12 @@ exports.config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
-    // },
+    onPrepare: function (config, capabilities) {
+        notifier.notify({
+            title: 'WebdriverIO',
+            message: 'Test run started'
+        });
+    },
     /**
      * Gets executed just before initialising the webdriver session and test framework. It allows you
      * to manipulate configurations depending on the capability or spec.
@@ -207,8 +212,14 @@ exports.config = {
      * Function to be executed after a test (in Mocha/Jasmine) or a step (in Cucumber) starts.
      * @param {Object} test test details
      */
-    // afterTest: function (test) {
-    // },
+    afterTest: function (test) {
+        if (!test.passed) {
+            notifier.notify({
+                title: 'Test failure!',
+                message: test.parent + ' ' + test.title
+            });
+        }
+    },
     /**
      * Hook that gets executed after the suite has ended
      * @param {Object} suite suite details
@@ -249,8 +260,12 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    onComplete: function(exitCode, config, capabilities, results) {
+        notifier.notify({
+            title: 'WebdriverIO',
+            message: 'Tests finished running!'
+        });
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session

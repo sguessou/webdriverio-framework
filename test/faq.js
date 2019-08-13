@@ -27,4 +27,14 @@ describe("Homepage FAQ Accordion", () => {
         const firstDisplay =  $first.getCSSProperty("display");
         expect(firstDisplay.value).to.equal("none");
     });
+
+    it('should handle multiple clicks in rapid succession', () => {
+        // click 20 times
+        for (let i = 0; i < 50; i++) {
+            var num = (i % 3) + 1;
+            browser.$(`.accordion .accordion-item:nth-child(${num}) a`).click();
+        }
+        const classnames = browser.$(`.accordion .accordion-item:nth-child(${num})`).getAttribute('class');
+        expect(classnames).to.contain('is-active');
+    });
 });
