@@ -1,3 +1,20 @@
+browser.addCommand("submitReview", (email, review) => {
+    if (email) {
+        // Enter the email address
+        browser.$("#review-email").setValue(email);
+    }
+
+    if (review) {
+        // Enter text in the comment form
+        browser.$("#review-content").setValue(review);
+    }
+
+    // Submit the review
+    browser.$('#comment-form > button').click();
+    browser.$('#comment-form > button').click();
+});
+
+
 describe('The product review form', () => {
 
     beforeEach(() => {
@@ -6,18 +23,13 @@ describe('The product review form', () => {
     });
     
     it('should add a review when submitted properly', (done) => {
-        // Enter the email address
-        browser.$("#review-email").setValue("email@example.com");
 
-        // Enter text in the comment form
-        browser.$("#review-content").setValue("Robots rules!!!");
-
-        // Submit the review
-        browser.$("#comment-form > button").click();
+        browser.submitReview("email@example.com", "Robots rules!!!");
 
         // Assert that our review now appears in the list
-        const hasReview = browser.$(".comment=Robots rules!!!").isExisting();
-        expect(hasReview, "comment text exists").to.be.true;
+        browser.$("#panel").waitUntil(() => {
+            return browser.$(".comment=Robots rules!!!").isExisting() === true;
+        }, 3000, "Review should appear in the list");
     });
 
     it('should show an error message if the input is wrong', () => {
@@ -26,7 +38,7 @@ describe('The product review form', () => {
         expect(isErrorShowing).to.be.false;
         
         // submit form without entering content
-        browser.$("#comment-form > button").click();
+        browser.submitReview();
         
         // assert that error message is now showing
         isErrorShowing = browser.$("p=There are some errors in your review.").isDisplayed();
@@ -35,31 +47,22 @@ describe('The product review form', () => {
 
     it('should hide the error message when input is corrected', () => {
         // submit form without entering content
-        browser.$("#comment-form > button").click();
+        browser.submitReview();
 
         // assert that error message is now showing
         let isErrorShowing = browser.$("p=Please enter a valid email address.").isDisplayed();
         expect(isErrorShowing).to.be.true;
         
-        browser.$("#review-email").setValue("email@example.com");
-
-        // move focus
-        browser.$("#review-content").click();
+        browser.submitReview("email@example.com");
 
         isErrorShowing = browser.$("p=Please enter a valid email address.").isDisplayed();
-        expect(isErrorShowing).to.be.false;
+        expect(isErrorShowing, ).to.be.false;
 
-        // Enter text in the comment form
-        browser.$("#review-content").setValue("Robots rules!!!");
+        browser.submitReview("email@example.com", "Wassup Robot!");
 
-        // move focus and submit the review
-        browser.$("#comment-form > button").click();
-        browser.$("#comment-form > button").click();
-        
         const isMainErrorShowing = browser.$("p=There are some errors in your review.").isDisplayed();
         const isContentErrorShowing = browser.$("p=A review without text isn't much of a review.").isDisplayed();
-       
-        expect(isMainErrorShowing, "Main error not showing").to.be.false;
+        expect(isMainErrorShowing, "Main error not showing").to.be.false
         expect(isContentErrorShowing, "Content error not showing").to.be.false;
     });
 
@@ -67,16 +70,12 @@ describe('The product review form', () => {
         let emailHasFocus = browser.$("#review-email").isFocused();
         expect(emailHasFocus, "email should not have focus").to.be.false;
 
-        browser.$("#comment-form > button").click();
+        browser.submitReview();
         
         emailHasFocus = browser.$("#review-email").isFocused();
         expect(emailHasFocus, "email should now have focus").to.be.true;
 
-        browser.$("#review-email").setValue("email@example.com");
-
-        // move focus and submit form
-        browser.$("#comment-form > button").click();
-        browser.$("#comment-form > button").click();
+        browser.submitReview("email@example.com");
         
         const contentHasFocus = browser.$("#review-content").isFocused();
         expect(contentHasFocus, "review content field should have focus").to.be.true;
