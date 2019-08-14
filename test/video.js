@@ -1,5 +1,5 @@
 browser.addCommand('isVideoPaused', function () {
-    return browser.execute(function () {
+    return browser.execute(() => {
         const video = document.querySelector('#dance-video');
         return video.paused;
     });

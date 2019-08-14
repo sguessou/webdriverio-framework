@@ -1,21 +1,6 @@
 const request = require('sync-request');
-
-browser.addCommand("submitReview", (email, review) => {
-    if (email) {
-        // Enter the email address
-        browser.$("#review-email").setValue(email);
-    }
-
-    if (review) {
-        // Enter text in the comment form
-        browser.$("#review-content").setValue(review);
-    }
-
-    // Submit the review
-    browser.$('#comment-form > button').click();
-    browser.$('#comment-form > button').click();
-});
-
+const reviewForm = require('./reviewForm.page.js');
+const Review = require('./Review.page.js');
 
 describe('The product review form', () => {
 
@@ -24,9 +9,9 @@ describe('The product review form', () => {
         browser.url("/product-page.html");
     });
     
-    it('should add a review when submitted properly', (done) => {
+    it('should add a review when submitted properly', () => {
 
-        browser.submitReview("email@example.com", "Robots rules!!!");
+        reviewForm.submit("email@example.com", "Robots rules!!!");
 
         // Assert that our review now appears in the list
         browser.$("#panel").waitUntil(() => {
@@ -36,34 +21,34 @@ describe('The product review form', () => {
 
     it('should show an error message if the input is wrong', () => {
         // assert that error message isn't showing to start
-        let isErrorShowing = browser.$("p=There are some errors in your review.").isDisplayed();
+        let isErrorShowing = reviewForm.reviewError.isDisplayed();
         expect(isErrorShowing).to.be.false;
         
         // submit form without entering content
-        browser.submitReview();
+        reviewForm.submit();
         
         // assert that error message is now showing
-        isErrorShowing = browser.$("p=There are some errors in your review.").isDisplayed();
+        isErrorShowing = reviewForm.reviewError.isDisplayed();
         expect(isErrorShowing).to.be.true;
     });
 
     it('should hide the error message when input is corrected', () => {
         // submit form without entering content
-        browser.submitReview();
+        reviewForm.submit();
 
         // assert that error message is now showing
-        let isErrorShowing = browser.$("p=Please enter a valid email address.").isDisplayed();
+        let isErrorShowing = reviewForm.emailError.isDisplayed();
         expect(isErrorShowing).to.be.true;
         
-        browser.submitReview("email@example.com");
+        reviewForm.submit("email@example.com");
 
-        isErrorShowing = browser.$("p=Please enter a valid email address.").isDisplayed();
+        isErrorShowing = reviewForm.emailError.isDisplayed();
         expect(isErrorShowing, ).to.be.false;
 
-        browser.submitReview("email@example.com", "Wassup Robot!");
+        reviewForm.submit("email@example.com", "Wassup Robot!");
 
-        const isMainErrorShowing = browser.$("p=There are some errors in your review.").isDisplayed();
-        const isContentErrorShowing = browser.$("p=A review without text isn't much of a review.").isDisplayed();
+        const isMainErrorShowing = reviewForm.reviewError.isDisplayed();
+        const isContentErrorShowing = reviewForm.reviewError.isDisplayed();
         expect(isMainErrorShowing, "Main error not showing").to.be.false
         expect(isContentErrorShowing, "Content error not showing").to.be.false;
     });
@@ -72,12 +57,12 @@ describe('The product review form', () => {
         let emailHasFocus = browser.$("#review-email").isFocused();
         expect(emailHasFocus, "email should not have focus").to.be.false;
 
-        browser.submitReview();
+        reviewForm.submit();
         
         emailHasFocus = browser.$("#review-email").isFocused();
         expect(emailHasFocus, "email should now have focus").to.be.true;
 
-        browser.submitReview("email@example.com");
+        reviewForm.submit("email@example.com");
         
         const contentHasFocus = browser.$("#review-content").isFocused();
         expect(contentHasFocus, "review content field should have focus").to.be.true;
@@ -90,12 +75,13 @@ describe('The product review form', () => {
         comments = comments.slice(0, 20);
 
         comments.forEach((comment, idx) => {
-            browser.submitReview(comment.email, comment.name);
-
-            const email = browser.$(`.reviews > .comment:nth-of-type(${idx + 3}) .email`).getText();
+            reviewForm.submit(comment.email, comment.name);
+            const review = new Review(idx + 3);
+            
+            const email = review.email.getText();
             expect(email).to.equal(comment.email);
 
-            const reviewText = browser.$(`.reviews > .comment:nth-of-type(${idx + 3}) .comment`).getText();
+            const reviewText = review.comment.getText();
             expect(reviewText).to.equal(comment.name);
         });
     });
