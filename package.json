@@ -29,7 +29,7 @@
     "@wdio/spec-reporter": "^5.11.7",
     "@wdio/sync": "^5.11.13",
     "chai": "^4.2.0",
-    "node-notifier": "^5.4.1",
+    "node-notifier": "^8.0.1",
     "onchange": "^6.0.0",
     "sync-request": "^6.1.0",
     "webdriverio": "^5.11.13"
